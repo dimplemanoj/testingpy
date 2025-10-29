@@ -1,0 +1,5 @@
+Migrating an existing image (both Windows and Linux) from Legacy BIOS to UEFI can be streamlined using the IONOS Backup Service. This process involves capturing the current Legacy BIOS image, configuring a UEFI-compatible target, and restoring the image with specific settings. Follow the guidelines below to ensure proper configuration:
+
+{% hint style="success" %}
+**Note:** Expires March 23, 2025. 
+{% endhint %}
