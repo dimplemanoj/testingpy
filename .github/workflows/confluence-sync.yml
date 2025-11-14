@@ -1,0 +1,67 @@
+name: Confluence to Markdown Sync
+
+# ----------------------------------------------------
+# 1. Workflow Triggers
+# The sync will run daily and can be triggered manually.
+# ----------------------------------------------------
+on:
+  # Allows manual execution from the GitHub Actions tab
+  workflow_dispatch:
+  # Runs on a schedule (e.g., every day at 02:00 UTC)
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  sync_docs:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Clone the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Required for the auto-commit action to work
+          fetch-depth: 0
+          
+      # Step 2: Set up Python for the exporter tool
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Step 3: Install the Confluence Markdown Exporter
+      - name: Install Confluence Exporter
+        run: pip install confluence-markdown-exporter
+
+      # Step 4: Run the export and save the file
+      - name: Export Confluence Page to Markdown
+        run: |
+          # Command format: confluence-markdown-exporter pages <Page ID> <Output File Path>
+          # Note: The output path is relative to the repository root.
+          confluence-markdown-exporter pages ${{ secrets.CONFLUENCE_PAGE_ID }} docs/confluence-doc.md
+        env:
+          # These environment variables are required by the exporter tool
+          ATLASSIAN_USERNAME: ${{ secrets.ATLASSIAN_USERNAME }}
+          ATLASSIAN_API_TOKEN: ${{ secrets.ATLASSIAN_API_TOKEN }}
+          ATLASSIAN_URL: ${{ secrets.ATLASSIAN_URL }}
+      
+      # Step 5: Check if the exported file has any changes
+      - name: Check for file changes
+        id: git_status
+        run: |
+          # Use git status --porcelain to check for uncommitted changes
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changes_detected=true" >> $GITHUB_OUTPUT
+          else
+            echo "changes_detected=false" >> $GITHUB_OUTPUT
+          fi
+          
+      # Step 6: Commit and push the changes back to the repo
+      - name: Commit and push if changes exist
+        if: steps.git_status.outputs.changes_detected == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'Docs: Automated sync from Confluence page'
+          branch: main # Change this to your main branch name (e.g., 'master')
+          # Use the default GitHub Actions bot user for the commit
+          commit_user_name: 'github-actions[bot]'
+          commit_user_email: 'github-actions[bot]@users.noreply.github.com'
