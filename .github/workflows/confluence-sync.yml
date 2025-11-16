@@ -37,7 +37,7 @@ jobs:
         run: |
           # Command format: confluence-markdown-exporter pages <Page ID> <Output File Path>
           # Note: The output path is relative to the repository root.
-          confluence-markdown-exporter pages ${{ secrets.CONFLUENCE_PAGE_ID }} docs/confluence-doc.md
+          confluence-markdown-exporter pages ${{ secrets.CONFLUENCE_PAGE_ID }} testingpy/eol.md
         env:
           # These environment variables are required by the exporter tool
           ATLASSIAN_USERNAME: ${{ secrets.ATLASSIAN_USERNAME }}
