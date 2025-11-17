@@ -1,0 +1,29 @@
+{
+  "tests": [
+    {
+      "steps": [
+        {
+          "action": "goTo",
+          "url": "https://www.google.com"
+        },
+        {
+          "action": "find",
+          "selector": "[title=Search]",
+          "click": true
+        },
+        {
+          "action": "typeKeys",
+          "keys": ["American Shorthair kittens", "$ENTER$"]
+        },
+        {
+          "action": "wait",
+          "duration": 5000
+        },
+        {
+          "action": "saveScreenshot",
+          "path": "search-results.png"
+        }
+      ]
+    }
+  ]
+}
